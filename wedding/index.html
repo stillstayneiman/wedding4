@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приглашение на свадьбу | Виктория & Александр</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700;800&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #fef9f5 0%, #faeedf 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== КОНВЕРТ С АНИМАЦИЕЙ ===== */
+        .envelope-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 24, 16, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .envelope-container {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            cursor: pointer;
+            transform-style: preserve-3d;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #f5e6d8;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e8d5c4;
+            clip-path: polygon(0% 0%, 50% 60%, 100% 0%);
+            transform-origin: top;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 3;
+        }
+
+        .envelope-side-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: #e8d5c4;
+            clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+            transform-origin: left;
+            transition: transform 0.6s ease;
+            z-index: 2;
+        }
+
+        .envelope-side-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: #e8d5c4;
+            clip-path: polygon(100% 0%, 0% 0%, 50% 100%);
+            transform-origin: right;
+            transition: transform 0.6s ease;
+            z-index: 2;
+        }
+
+        .invitation-letter {
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            height: 0;
+            background: #fff9f5;
+            border-radius: 8px;
+            padding: 0 15px;
+            overflow: hidden;
+            transition: height 0.6s ease 0.3s, padding 0.6s ease 0.3s;
+            z-index: 1;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .invitation-letter-content {
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            font-family: 'EB Garamond', serif;
+            color: #c97a5a;
+        }
+
+        .invitation-letter-content h3 {
+            font-size: 1.3em;
+            margin-top: 20px;
+        }
+
+        .invitation-letter-content p {
+            font-size: 0.9em;
+            margin: 10px 0;
+            font-family: 'Raleway', sans-serif;
+            color: #5a3e32;
+        }
+
+        .open-text {
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .envelope-overlay.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-overlay.open .envelope-side-left {
+            transform: rotateY(-180deg);
+        }
+
+        .envelope-overlay.open .envelope-side-right {
+            transform: rotateY(180deg);
+        }
+
+        .envelope-overlay.open .invitation-letter {
+            height: 180px;
+            padding: 15px;
+        }
+
+        .envelope-overlay.open .invitation-letter-content {
+            opacity: 1;
+            transition-delay: 0.5s;
+        }
+
+        .envelope-overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 1s ease 0.5s;
+        }
+
+        .container.visible {
+            opacity: 1;
+        }
+
+        .invite-card {
+            background: white;
+            border-radius: 32px;
+            padding: 48px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            animation: fadeInUp 0.8s ease-out;
+            text-align: center;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .heart-icon {
+            font-size: 56px;
+            animation: heartbeat 1.5s ease infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        h1 {
+            font-family: 'EB Garamond', serif;
+            color: #c97a5a;
+            margin: 10px 0 8px;
+            font-size: 2.2em;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        .names {
+            font-family: 'EB Garamond', serif;
+            font-size: 3em;
+            color: #2c1810;
+            margin: 10px 0;
+            font-weight: 600;
+            font-style: normal;
+            letter-spacing: 1px;
+        }
+
+        /* Обратный отсчёт */
+        .countdown {
+            background: linear-gradient(135deg, #c97a5a 0%, #b06040 100%);
+            border-radius: 24px;
+            padding: 25px;
+            margin: 25px 0;
+            color: white;
+        }
+
+        .countdown h3 {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            text-align: center;
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 20px;
+            min-width: 80px;
+            backdrop-filter: blur(5px);
+        }
+
+        .countdown-number {
+            font-family: 'EB Garamond', serif;
+            font-size: 2.5em;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .hero-photo {
+            margin: 25px 0;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .hero-photo img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .hero-photo img:hover {
+            transform: scale(1.02);
+        }
+
+        .story-text {
+            font-family: 'Raleway', sans-serif;
+            font-size: 0.95em;
+            line-height: 1.7;
+            color: #5a3e32;
+            margin: 30px 0 20px;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .kids-photos {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .kid-photo {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .kid-photo img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            border: 3px solid #c97a5a;
+        }
+
+        .kid-photo img:hover {
+            transform: scale(1.05);
+        }
+
+        .time-caption {
+            margin-top: 20px;
+            font-family: 'EB Garamond', serif;
+            font-size: 1.2em;
+            color: #c97a5a;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .invitation-text {
+            background: #fef9f5;
+            padding: 30px;
+            border-radius: 24px;
+            margin: 30px 0;
+            text-align: center;
+            border: 1px solid #f0e0d4;
+        }
+
+        .invitation-text p {
+            font-family: 'Raleway', sans-serif;
+            font-size: 0.95em;
+            line-height: 1.7;
+            color: #3a2a22;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #c97a5a, #f0cfc0, #c97a5a);
+            margin: 20px auto;
+        }
+
+        .date-block {
+            margin: 25px 0;
+        }
+
+        .date-number {
+            font-family: 'EB Garamond', serif;
+            font-size: 2.8em;
+            font-weight: 600;
+            color: #c97a5a;
+            font-style: normal;
+        }
+
+        .date-text {
+            font-family: 'Raleway', sans-serif;
+            font-size: 1em;
+            color: #2c1810;
+            margin-top: 5px;
+            font-weight: 300;
+        }
+
+        .location {
+            margin: 25px 0;
+        }
+
+        .map-placeholder {
+            margin: 20px 0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .map-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .map-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #c97a5a 0%, #b06040 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .map-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(201,122,90,0.3);
+        }
+
+        .question {
+            background: #fef9f5;
+            border-radius: 24px;
+            padding: 28px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .question h3 {
+            font-family: 'EB Garamond', serif;
+            color: #2c1810;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .option {
+            margin: 12px 0;
+            padding: 14px 20px;
+            background: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1.5px solid #f0e0d4;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: #fff5ef;
+            transform: translateX(5px);
+            border-color: #c97a5a;
+        }
+
+        .option.selected {
+            border-color: #c97a5a;
+            background: #fff5ef;
+            box-shadow: 0 2px 8px rgba(201,122,90,0.2);
+        }
+
+        .option input {
+            margin-right: 12px;
+            accent-color: #c97a5a;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .checkbox-option {
+            background: white;
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1.5px solid #f0e0d4;
+            font-family: 'Raleway', sans-serif;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-option:hover {
+            background: #fff5ef;
+            border-color: #c97a5a;
+        }
+
+        .checkbox-option.selected {
+            border-color: #c97a5a;
+            background: #fff5ef;
+        }
+
+        .checkbox-option input {
+            margin: 0;
+            accent-color: #c97a5a;
+            width: 18px;
+            height: 18px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1.5px solid #f0e0d4;
+            border-radius: 16px;
+            margin-top: 12px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 13px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #c97a5a;
+        }
+
+        button {
+            background: linear-gradient(135deg, #c97a5a 0%, #b06040 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 24px;
+            width: 100%;
+            font-family: 'Raleway', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(201,122,90,0.3);
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 16px;
+            border-radius: 16px;
+            margin-top: 20px;
+            display: none;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        footer {
+            text-align: center;
+            color: #a88b78;
+            margin-top: 20px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 300;
+        }
+
+        @media (max-width: 550px) {
+            .invite-card {
+                padding: 30px 20px;
+            }
+            .kids-photos {
+                gap: 10px;
+            }
+            .kid-photo img {
+                width: 90px;
+                height: 90px;
+            }
+            .names {
+                font-size: 2.2em;
+            }
+            .countdown-item {
+                min-width: 60px;
+                padding: 10px;
+            }
+            .countdown-number {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Конверт с анимацией -->
+    <div class="envelope-overlay" id="envelopeOverlay">
+        <div class="envelope-container" id="envelopeContainer">
+            <div class="envelope">
+                <div class="envelope-side-left"></div>
+                <div class="envelope-side-right"></div>
+                <div class="envelope-flap"></div>
+                <div class="invitation-letter">
+                    <div class="invitation-letter-content">
+                        <h3>Вам пришло приглашение</h3>
+                        <p>Нажмите, чтобы открыть</p>
+                        <p>❤️</p>
+                    </div>
+                </div>
+            </div>
+            <div class="open-text">📨 ОТКРЫТЬ ПРИГЛАШЕНИЕ</div>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="container" id="mainContent">
+        <div class="invite-card">
+            <div class="heart-icon">❤️</div>
+            <h1>Приглашение на свадьбу</h1>
+            <div class="names">Виктория & Александр</div>
+            
+            <div class="countdown">
+                <h3>💕 До нашей свадьбы осталось 💕</h3>
+                <div class="countdown-timer" id="countdown">
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="days">00</div>
+                        <div class="countdown-label">Дней</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="hours">00</div>
+                        <div class="countdown-label">Часов</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="minutes">00</div>
+                        <div class="countdown-label">Минут</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="seconds">00</div>
+                        <div class="countdown-label">Секунд</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-photo">
+                <img src="images/main.jpg" alt="Виктория и Александр">
+            </div>
+            
+            <div class="story-text">
+                Узнали этих малышей?<br>
+                Росли в разных уголках, чтобы однажды встретиться...
+            </div>
+
+            <div class="kids-photos">
+                <div class="kid-photo">
+                    <img src="https://sun9-25.userapi.com/s/v1/ig2/EKcFSbKM-OlAeP4zzxhy-vSQc6wuE09p8lyN2ZrovPLpQQpOihrmvAovAPt-uZhauJd83juCDkVjWtEBU7QN0TYD.jpg?quality=95&as=32x47,48x70,72x105,108x158,160x233,240x350,360x525,480x700,540x788,640x933,720x1050,1080x1575,1182x1724&from=bu&cs=1182x0" alt="Детское фото Вики">
+                </div>
+                <div class="kid-photo">
+                    <img src="https://sun9-70.userapi.com/s/v1/ig2/b98mAxmZDptWSq43fwAiwez5kpFEEcWlEF7ZUMRglM-_GAvaMRetf8_RUG2Z5jGD6l6w2BPXxHmOBsqXkgwe3Jhk.jpg?quality=95&as=32x44,48x66,72x99,108x149,160x220,240x330,360x495,480x661,540x743,640x881,720x991,930x1280&from=bu&cs=930x0" alt="Детское фото Саши">
+                </div>
+            </div>
+
+            <div class="time-caption">
+                ⏳ Время летит незаметно...
+            </div>
+
+            <div class="story-text">
+                И вот мы уже готовы сказать друг другу "ДА"!
+            </div>
+
+            <div class="invitation-text">
+                <p>💌 <strong>ДОРОГИЕ НАШИ ДРУЗЬЯ И РОДНЫЕ!</strong> 💌</p>
+                <p>В нашей жизни наступает самый важный и волнительный момент — день, когда мы станем мужем и женой.</p>
+                <p>Это официальное приглашение на нашу свадьбу! А получили вы его потому, что мы очень хотим видеть вас в этот день рядом с нами! Пусть этот вечер станет тёплым воспоминанием, которое мы сохраним в сердцах навсегда.</p>
+                <p><strong>Будем счастливы видеть вас в кругу самых близких людей!</strong></p>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="date-block">
+                <div class="date-number">10 июля 2026</div>
+                <div class="date-text">📅 Пятница • 17:00</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="location">
+                <div class="date-text" style="font-size: 1em;">📍 Ресторан "GRANAT"</div>
+                <div class="date-text" style="font-size: 0.85em; margin-top: 5px;">г.Нижний Новгород, Казанское шоссе, 29</div>
+                
+                <div class="map-placeholder">
+                    <img class="map-image" src="images/restaurant.jpg" alt="Ресторан GRANAT">
+                </div>
+                
+                <a href="https://yandex.ru/maps/-/CPV~5ZLr" 
+                   class="map-button" 
+                   target="_blank">
+                   🗺️ Открыть карту
+                </a>
+            </div>
+        </div>
+
+        <div class="invite-card">
+            <h2 style="font-family: 'EB Garamond', serif; color: #2c1810; margin-bottom: 20px; font-size: 1.8em; font-weight: 500;">Пожалуйста, ответьте</h2>
+            
+            <div class="question">
+                <h3>💕 Вы сможете присутствовать?</h3>
+                <div class="option" data-q="attendance" data-value="yes">
+                    <input type="radio" name="attendance" value="yes"> ✅ Да, с радостью!
+                </div>
+                <div class="option" data-q="attendance" data-value="no">
+                    <input type="radio" name="attendance" value="no"> ❌ К сожалению, не смогу
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>🍽️ Ваши вкусовые предпочтения</h3>
+                <p style="text-align: center; margin-bottom: 15px; color: #5a3e32; font-family: 'Raleway', sans-serif; font-size: 0.8em;">Выберите блюда, которые вам нравятся (можно несколько)</p>
+                <div class="checkbox-group" id="foodPreferences">
+                    <label class="checkbox-option" data-food="meat">
+                        <input type="checkbox" value="Мясо"> 🥩 Мясо
+                    </label>
+                    <label class="checkbox-option" data-food="fish">
+                        <input type="checkbox" value="Рыба"> 🐟 Рыба/Морепродукты
+                    </label>
+                    <label class="checkbox-option" data-food="chicken">
+                        <input type="checkbox" value="Курица"> 🍗 Курица
+                    </label>
+                    <label class="checkbox-option" data-food="vegetarian">
+                        <input type="checkbox" value="Вегетарианское"> 🥗 Вегетарианское
+                    </label>
+                    <label class="checkbox-option" data-food="mushrooms">
+                        <input type="checkbox" value="Грибы"> 🍄 Грибы
+                    </label>
+                    <label class="checkbox-option" data-food="cheese">
+                        <input type="checkbox" value="Сыр"> 🧀 Сыр
+                    </label>
+                </div>
+                <textarea id="allergies" rows="2" placeholder="Если есть аллергия или особые пожелания по еде, напишите здесь..."></textarea>
+            </div>
+
+            <div class="question">
+                <h3>Напишите ваше имя, пожелания и тёплые слова💝 </h3>
+                <textarea id="wishes" rows="3" placeholder="Напишите что-нибудь доброе..."></textarea>
+            </div>
+
+            <button onclick="sendResponses()">📨 Отправить ответ</button>
+            
+            <div class="loader" id="loader">
+                <div>Отправка...</div>
+            </div>
+            
+            <div class="success" id="success">
+                ❤️ Спасибо! Ваш ответ отправлен! ❤️<br>
+                Мы очень ждём вас!
+            </div>
+        </div>
+        
+        <footer>
+            <p>✨ До встречи на нашей свадьбе! ✨</p>
+        </footer>
+    </div>
+
+    <script>
+        // ========== ДАННЫЕ ДЛЯ TELEGRAM (ЗАМЕНИ) ==========
+        const BOT_TOKEN = '8605666113:AAGIjNgvvcajKA1ga7Gt33up1s7PbA3dcCE';
+        const CHAT_ID = '1420378187';
+        // ====================================================
+        
+        // ДАТА СВАДЬБЫ (ИЗМЕНИ НА СВОЮ)
+        const WEDDING_DATE = new Date(2026, 6, 10, 17, 0, 0);
+        
+        // ===== ОБРАТНЫЙ ОТСЧЁТ =====
+        function updateCountdown() {
+            const now = new Date();
+            const diff = WEDDING_DATE - now;
+            
+            if (diff <= 0) {
+                document.getElementById('days').innerHTML = '00';
+                document.getElementById('hours').innerHTML = '00';
+                document.getElementById('minutes').innerHTML = '00';
+                document.getElementById('seconds').innerHTML = '00';
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').innerHTML = String(days).padStart(2, '0');
+            document.getElementById('hours').innerHTML = String(hours).padStart(2, '0');
+            document.getElementById('minutes').innerHTML = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').innerHTML = String(seconds).padStart(2, '0');
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        
+        // ===== АНИМАЦИЯ КОНВЕРТА =====
+        const envelopeOverlay = document.getElementById('envelopeOverlay');
+        const envelopeContainer = document.getElementById('envelopeContainer');
+        const mainContent = document.getElementById('mainContent');
+        
+        function openEnvelope() {
+            envelopeOverlay.classList.add('open');
+            
+            setTimeout(() => {
+                envelopeOverlay.classList.add('hide');
+                mainContent.classList.add('visible');
+                
+                setTimeout(() => {
+                    envelopeOverlay.style.display = 'none';
+                }, 1000);
+            }, 1000);
+        }
+        
+        envelopeContainer.addEventListener('click', openEnvelope);
+        
+        // ===== ОСТАЛЬНЫЕ ФУНКЦИИ =====
+        let selectedAnswers = {
+            attendance: null
+        };
+
+        document.querySelectorAll('.option').forEach(option => {
+            const radios = option.querySelector('input[type="radio"]');
+            if (radios) {
+                radios.addEventListener('change', (e) => {
+                    const q = option.dataset.q;
+                    selectedAnswers[q] = e.target.value;
+                });
+            } else {
+                option.addEventListener('click', () => {
+                    const q = option.dataset.q;
+                    const val = option.dataset.value;
+                    selectedAnswers[q] = val;
+                    
+                    document.querySelectorAll(`.option[data-q="${q}"]`).forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                    
+                    const radio = option.querySelector('input[type="radio"]');
+                    if (radio) radio.checked = true;
+                });
+            }
+        });
+
+        document.querySelectorAll('.checkbox-option').forEach(opt => {
+            const checkbox = opt.querySelector('input');
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+        });
+
+        function getSelectedFoods() {
+            const selected = [];
+            document.querySelectorAll('#foodPreferences input[type="checkbox"]:checked').forEach(cb => {
+                selected.push(cb.value);
+            });
+            return selected;
+        }
+
+        async function sendResponses() {
+            if (!selectedAnswers.attendance) {
+                alert('💕 Пожалуйста, ответьте, сможете ли вы присутствовать');
+                return;
+            }
+
+            const wishes = document.getElementById('wishes').value;
+            const allergies = document.getElementById('allergies').value;
+            const selectedFoods = getSelectedFoods();
+            
+            let message = '🎉 НОВЫЙ ОТВЕТ НА ПРИГЛАШЕНИЕ 🎉\n\n';
+            message += `📌 Присутствие: ${selectedAnswers.attendance === 'yes' ? 'Да, с радостью! ✅' : 'Нет, к сожалению ❌'}\n`;
+            
+            if (selectedFoods.length > 0) {
+                message += `🍽️ Предпочтения: ${selectedFoods.join(', ')}\n`;
+            }
+            
+            if (allergies && allergies.trim()) {
+                message += `⚠️ Особые пожелания/аллергии: ${allergies}\n`;
+            }
+            
+            if (wishes && wishes.trim()) {
+                message += `💝 Пожелания: ${wishes}\n`;
+            }
+            
+            message += `\n🕐 ${new Date().toLocaleString('ru-RU')}`;
+
+            document.getElementById('loader').classList.add('active');
+            
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.ok) {
+                    document.getElementById('success').style.display = 'block';
+                    document.querySelector('button').disabled = true;
+                    document.querySelector('button').style.opacity = '0.6';
+                } else {
+                    alert('Ошибка отправки. Попробуйте позже');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка соединения. Проверьте интернет');
+            } finally {
+                document.getElementById('loader').classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
